@@ -1,0 +1,22 @@
+{
+  "name": "jquery-plugin-manager",
+  "version": "1.0.0",
+  "description": "Plugin Manager",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node main.js"
+  },
+  "keywords": [
+    "Plugin",
+    "Manager"
+  ],
+  "author": "Polskie Dev",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "live-server": "^1.2.0"
+  }
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>jQuery Plugin Test</title>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+			  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			  crossorigin="anonymous"></script>
+	<script type="text/javascript" src="./script/plugin.js"></script>
+</head>
+<body>
+
+<script>
+$(document).ready(function(){
+	// var loginLayer = new ApplicationLayer('login-layer', {title: 'The quick brown'});
+	// var loginLayer2 = new ApplicationLayer('login-layer2');
+	// loginLayer.getInstanceIds();
+	// console.log(loginLayer2);
+
+	$layer1 = new LayerBuilder('layer1', {'title': 'The quick brown fox', 'ajax': {}});
+	$layer2 = new LayerBuilder('layer2', {'ajax':{
+		config: {
+			url:'ajax.php'
+		},
+		// before: function($ele) {
+		// 	console.log('Before Ajax');
+		// 	console.log($ele);
+		// },
+		// after: function($ele) {
+		// 	console.log('After Ajax');
+		// 	console.log($ele);
+		// },
+		// success: function(data, $ele) {
+		// 	console.log('Ajax Success');
+		// 	console.log($ele);
+		// }
+	}});
+	$layer3 = new LayerBuilder('layer3', {'url': 'ajax.json'});
+
+	$layer1._log('testing');
+
+	$layer1.render();
+	$layer2.render();
+	$layer3.render();
+});
+</script>
+</body>
+</html>
