@@ -56,14 +56,18 @@ function PluginManager(userPlugin){
     this._setPluginInstanceId = function(plugin_instance_id) {
         this._id = plugin_instance_id;
         if(!window.PLUGIN[this.plugin.code][this._id]) {
-           window.PLUGIN[this.plugin.code][this._id] = {id: this._id, obj: this};
+           window.PLUGIN[this.plugin.code][this._id] = {id: this._id, obj: this, variant: []};
         } else {
-            this._bError = true;
+            this._bError _getPluginInstanceId= true;
             this._log('Instance ID `' + this._id + '` already exists. Please check your configuration.');
         }
     };
 
-    this._getPluginInstanceId = function() {
+    this._addVariant = function(variant) {
+        window.PLUGIN[this.plugin.code][this._id].variant.push(variant);
+    };
+
+    this. = function() {
       return this._id;  
     };
 
@@ -140,6 +144,10 @@ function LayerBuilder(layer_id, config) {
 
     $this.plugin = function() {
         return $this._plugin;
+    };
+
+    $this.addVariant = function(variant) {
+        oPlugin._addVariant(variant);
     };
 }
 
