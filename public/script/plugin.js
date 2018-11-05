@@ -56,18 +56,14 @@ function PluginManager(userPlugin){
     this._setPluginInstanceId = function(plugin_instance_id) {
         this._id = plugin_instance_id;
         if(!window.PLUGIN[this.plugin.code][this._id]) {
-           window.PLUGIN[this.plugin.code][this._id] = {id: this._id, obj: this, variant: []};
+           window.PLUGIN[this.plugin.code][this._id] = {id: this._id, obj: this};
         } else {
-            this._bError _getPluginInstanceId= true;
+            this._bError = true;
             this._log('Instance ID `' + this._id + '` already exists. Please check your configuration.');
         }
     };
 
-    this._addVariant = function(variant) {
-        window.PLUGIN[this.plugin.code][this._id].variant.push(variant);
-    };
-
-    this. = function() {
+    this._getPluginInstanceId = function() {
       return this._id;  
     };
 
@@ -110,6 +106,8 @@ function LayerBuilder(layer_id, config) {
     });
 
     var $this = this;
+    
+    $this.variant = null;
 
     oPlugin._setPluginInstanceId(layer_id);
     oPlugin._setDefaultConfig({
@@ -146,12 +144,44 @@ function LayerBuilder(layer_id, config) {
         return $this._plugin;
     };
 
-    $this.addVariant = function(variant) {
-        oPlugin._addVariant(variant);
-    };
+    $this.render = function(variant_id) {
+      var oLayerVariant = new LayerVariantBuilder();
+      $this.variant = oLayerVariant.getVariant();
+
+      if($this.variant) {
+        $this.ui = $this.variant.ui;
+        $this.behavior = $this.variant.behavior;
+
+        $this.ui().render();
+      }
+    }  
 }
 
-$.extend(LayerBuilder.prototype, {
+function LayerVariantBuilder() {
+  this.variant = null;
+  this.default_variant_id = 'dialog';
+  this.setDefault = function(){
+    this.setVariant(this.default_variant_id);
+  };
+
+  this.setVariant = function(variant_id) {
+    if(variant_id == 'dialog') {
+      this.variant = new DialogLayerVariant();
+    }
+    
+    return this.variant;
+  };
+
+  this.getVariant = function() {
+    return this.variant;
+  };
+
+  this.setDefault();
+}
+  
+var DialogLayerVariant = function() {};
+
+$.extend(DialogLayerVariant.prototype, {
     ui: function() {
         var $this = this;
 
@@ -264,13 +294,10 @@ $.extend(LayerBuilder.prototype, {
         });
 
         return $this;
-    },
-    render: function() {
-        this.ui().render();
-    }  
+    }
 });
 
-$.extend(LayerBuilder.prototype, {
+$.extend(DialogLayerVariant.prototype, {
     behavior: function() {
         var $this = this;
         var $context = null;
