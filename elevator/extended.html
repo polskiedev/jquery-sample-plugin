@@ -1,0 +1,261 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Elevator</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<div id="app2"></div>
+<div id="msg"></div>
+<div id="nav">
+  <button id="btnUp">Up</button>
+  <button id="btnDown">Down</button>
+</div>
+<script>
+jQuery(document).ready(function($) {
+  var $app = $('#app');
+  var Elevator = function(userConfig){
+
+    var $this = this;
+
+    this.defaultConfig = {
+      'current': 1,
+      'max': 20,
+      'logger': function(msg) {
+        console.log(msg);
+      }
+    };
+    this.userConfig = userConfig;
+    this.config = $.extend({}, this.defaultConfig, this.userConfig);
+
+    this.data = {
+      'current': 1,
+      'max': 1
+    };
+
+    this.init = function() {
+      this.reConfig();
+      this.render();
+    }
+
+    this.reConfig = function() {
+      this.data.current = this.config.current;
+      this.data.max = this.config.max;
+    };
+
+    this.getData = function() {
+      return $this.data;
+    };
+
+    this.getConfig = function() {
+      return $this.config;
+    };
+
+    this.getApp = function() {
+      return $('#'+this.config.id)
+    };
+
+    // this.createButtonId = function(btn_id) {
+    //   return this.config.id + '_' + 'btn_' + btn_id;
+    // };
+
+    this.getButtons = function() {
+      return $this.getApp().find('button.floor-level');
+    };
+
+    this.setFloorLevel = function(n) {
+      if(n == 'undefined') {
+        return;
+      }
+      this.data.current = n;
+    };
+
+    this.goToFloor = function(n) {
+      if(n == 'undefined') {
+        n = $this.data.current;
+      }
+
+      $this.setFloorLevel(n);
+      $this.behavior.keyup();
+    };
+
+    this.ui = {
+      'render': function() {
+        var nFloors = $this.data.max;
+
+        if(nFloors > 0) {
+          for (var i = nFloors; i >= 1; i--) {
+            var ctr = i;
+            var $btn = $('<button />')
+              .addClass('floor-level')
+              .addClass($this.getConfig().id+'_btn')
+              .data('floor', i)
+              .click(function(){
+              })
+              .html('Floor: '+i);
+
+            $this.getApp().append($btn);
+            // console.log('Create floor#'+i);
+          }
+        }
+      }
+    }
+
+    this.behavior = {
+      'bindKeyUp': function(event) {
+        var direction = false;
+
+        if($this.getButtons().length > 0) { 
+          switch(event.keyCode) {
+            case 38:
+              direction = 'up';
+              break;
+            case 40:
+              direction = 'down';
+              break;
+            default:
+              break;
+          }
+        }
+        this.keyup(direction);
+      },
+      'keyup': function(direction) {
+        var btn = $this.getButtons();
+        var current = $this.getData().current;
+        var max = $this.getData().max;
+        var msg = '';
+
+        //@emulate elevator behavior
+        if(direction == 'up' && current < parseInt(max)) {
+          current++;
+        }
+
+        if(direction == 'down' && current > 1) {
+          current--;
+        }
+
+        $this.setFloorLevel(current);
+
+        //@fire message for logging
+        if(current == max) {
+          msg = 'You have reached the top';
+        } else if(current == 1) {
+          msg = 'You are on the ground floor';
+        } else {
+          msg = 'You are now on floor#' + current;
+        }
+
+        if(typeof($this.getConfig().logger) == 'function') {
+          $this.getConfig().logger(msg);
+        }
+        
+        //@add class toggles
+        btn.removeClass('active')
+          .removeClass('passed');
+ 
+        btn.each(function() {
+          var floor = $(this).data('floor');
+
+          if(floor == current) {
+            $(this).addClass('active');
+          }
+
+          if(floor < current) {
+            $(this).addClass('passed');
+          }
+        });
+      },
+      'attach': function() {
+        $('#btnUp').click(function(){
+          $this.behavior.keyup('up');  
+        });
+        
+        $('#btnDown').click(function(){
+          $this.behavior.keyup('down');  
+        });
+      }
+    }; 
+
+    this.render = function(){
+      $this.ui.render();
+    };
+
+    this.init();
+  };//@End of Elevator constructor
+
+  var elev = new Elevator({
+    'id': 'app',
+    'max': 10,
+    'current':3,
+    'logger': function(msg) {
+      if(msg != '') {      
+        var $msgEle = $('<div />')
+          .attr({'class':'log-message'})
+          .text(msg);
+        $('#msg').append($msgEle);
+      }
+    }
+  });
+
+  $(document).keyup(function (event) {
+      elev.behavior.bindKeyUp(event);
+  });
+
+  
+  // function showMessage(msg) {
+  //   $('#msg').text(msg);
+  // }
+});
+</script>
+<style>
+body {
+  
+}
+#app, #nav{
+  border:1px solid black;
+  width:300px;
+  margin:0 auto;
+  padding:5px;
+  text-align:center;
+}
+
+#nav button {
+  width:30%;
+  display: inline-block;
+  text-align:center;
+}
+
+#msg{
+  border:1px solid black;
+  padding:5px;
+  position:absolute;
+  bottom:5px;
+  right:5px;
+  height:200px;
+  overflow-y: scroll;
+}
+
+button {
+  clear:both;
+  display: block;
+  margin:5px;
+  width:calc(100% - 10px);
+  text-align:left;
+  cursor: pointer;
+}
+
+button.active {
+  background: green;
+  color:white;
+  font-weight: bold;
+}
+
+button.passed {
+  background: gray;
+  color:white;
+  font-style: italic;
+}
+</style>
+</body>
+</html>

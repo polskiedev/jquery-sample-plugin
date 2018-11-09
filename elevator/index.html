@@ -1,0 +1,179 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Elevator</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<div id="msg"></div>
+<div id="nav">
+  <button id="btnUp">Up</button>
+  <button id="btnDown">Down</button>
+</div>
+<script>
+jQuery(document).ready(function($) {
+  var $app = $('#app');
+
+  function init() {
+    $app.data('floors', 20);
+    $app.data('default-floor', 10);
+
+    $('#btnUp').bind('click', function(){ attachEvent('up'); });
+    $('#btnDown').bind('click', function(){ attachEvent('down'); });
+
+    renderFloors();
+    goToFloor($app.data('default-floor'));
+  }
+
+  function renderFloors() {
+    console.log('Trigger function: renderApp()'); 
+    var nFloors = $app.data('floors');
+
+    if(nFloors > 0) {
+      for (var i = nFloors; i >= 1; i--) {
+        var ctr = i;
+        var $btn = $('<button />')
+          .attr({
+            'id': 'btn_'+i
+          })
+          .data('floor', i)
+          .unbind('click')
+          .click(function(){
+            goToFloor( $(this).data('floor') );
+          })
+          .html('Floor: '+i);
+
+        $app.append($btn);
+        // console.log('Create floor#'+i);
+      }
+    }
+  }
+
+  function setFloor(n) {
+    $app.data('current', n);
+  }
+
+  function goToFloor(n) {
+    setFloor(n);
+    attachEvent();
+  }
+
+  function showMessage(msg) {
+    $('#msg').text(msg);
+  }
+
+  function attachEvent(direction) {
+    var msg = '';
+    var current = $app.data('current');
+    var nFloors = $app.data('floors');
+
+    if(direction == 'up' && current < parseInt(nFloors)) {
+      current++;
+      $app.data('current', current);
+    }
+
+    if(direction == 'down' && current > 1) {
+      current--;
+      $app.data('current', current);
+    }
+
+    if(current == nFloors) {
+      msg = 'You have reached the top';
+    } else if(current == 1) {
+      msg = 'You are on the ground floor';
+    } else {
+      msg = 'You are now on floor#' + current;
+    }
+
+    $app.find('button')
+      .removeClass('active')
+      .removeClass('passed');
+
+    $('#btn_'+current).addClass('active');
+
+    $app.find('button').each(function(){
+      var $btn = $(this);
+      var nFloor = $btn.data('floor');
+      if(nFloor < current) {
+        $btn.addClass('passed');
+      }
+    });
+
+    showMessage(msg);
+    // console.log(current);
+  }
+
+  $(document).keyup(function (event) {
+    var key = false;
+
+    if($('button').length > 0) { 
+      switch(event.keyCode) {
+        case 38:
+          key = 'up';
+          break;
+        case 40:
+          key = 'down';
+          break;
+        default:
+          break;
+      }
+
+      if(key !== false) {
+       // console.log('Trigger keyup event: ' + key);
+       attachEvent(key);
+      }
+    }
+  });
+  init();
+});
+</script>
+<style>
+body {
+  
+}
+#app, #nav{
+  border:1px solid black;
+  width:300px;
+  margin:0 auto;
+  padding:5px;
+  text-align:center;
+}
+
+#nav button {
+  width:30%;
+  display: inline-block;
+  text-align:center;
+}
+
+#msg{
+  border:1px solid black;
+  padding:5px;
+  position:absolute;
+  top:5px;
+  left:5px;
+}
+
+button {
+  clear:both;
+  display: block;
+  margin:5px;
+  width:calc(100% - 10px);
+  text-align:left;
+  cursor: pointer;
+}
+
+button.active {
+  background: green;
+  color:white;
+  font-weight: bold;
+}
+
+button.passed {
+  background: gray;
+  color:white;
+  font-style: italic;
+}
+</style>
+</body>
+</html>
